@@ -1,0 +1,174 @@
+{
+  "brand": {
+    "name": "ShetiTech",
+    "tagline": "Smart Farming, Better Future.",
+    "subtagline": "Digital Agriculture Guide for Farmers"
+  },
+  "nav": {
+    "home": "Home",
+    "crops": "Crops",
+    "seasonCrops": "Season-wise Crops",
+    "harvesters": "Harvester Info",
+    "fertilizers": "Fertilizer Info",
+    "marketOverview": "Market Overview",
+    "buyersTraders": "Buyers & Traders",
+    "subsidies": "Subsidy Details",
+    "calculators": "Calculators",
+    "weather": "Weather",
+    "mandi": "Mandi Rates",
+    "guides": "Knowledge Centre",
+    "switchLang": "मराठी",
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "hero": {
+    "badge": "🌱 Maharashtra's Modern Agriculture Platform",
+    "titlePrefix": "Smart Farming,",
+    "titleHighlight": "Better Future!",
+    "description": "Empowering farmers with digital decision tools, comprehensive crop guides, farm calculators, weather forecasts, and market insights all in one place.",
+    "searchPlaceholder": "Search sugarcane, onion, soybean, turmeric...",
+    "searchBtn": "Search",
+    "exploreCrops": "Explore Crops",
+    "exploreTools": "Explore Tools",
+    "stats": {
+      "cropsCount": "8+ Major Crops",
+      "toolsCount": "5 Free Calculators",
+      "langSupport": "Marathi & English",
+      "farmerFocus": "100% Farmer-Centric"
+    }
+  },
+  "cropsSection": {
+    "badge": "Major Crops in Maharashtra",
+    "title": "Comprehensive Crop Advisory & Management",
+    "subtitle": "Agronomy practices, fertilizer recommendations, irrigation, and yield estimates",
+    "allFilter": "All Crops",
+    "cashFilter": "Cash Crops",
+    "spicesFilter": "Spices",
+    "cerealsFilter": "Cereals",
+    "pulsesFilter": "Pulses",
+    "duration": "Duration",
+    "yield": "Expected Yield",
+    "water": "Water Need",
+    "soil": "Soil Type",
+    "viewDetails": "View Crop Details",
+    "noResults": "No crops found matching your search. Please try another query."
+  },
+  "toolsSection": {
+    "badge": "Digital Farm Tools",
+    "title": "Smart Farm Calculators",
+    "subtitle": "Calculate accurate fertilizer dosages, land conversions, and cultivation economics",
+    "openTool": "Use Calculator",
+    "popular": "Popular"
+  },
+  "weatherSection": {
+    "badge": "Weather Advisory (Sample Preview)",
+    "title": "District-Wise Agro Weather Forecast",
+    "subtitle": "Weather intelligence for irrigation, spraying, and harvest planning",
+    "disclaimer": "Notice: This is a sample weather preview. For actual decisions, consult the official India Meteorological Department (IMD).",
+    "selectDistrict": "Select District:",
+    "temp": "Temperature",
+    "humidity": "Humidity",
+    "rainChance": "Rain Chance",
+    "wind": "Wind Speed",
+    "advisoryTitle": "Farmer Weather Advisory",
+    "forecastTitle": "5-Day Outlook"
+  },
+  "mandiSection": {
+    "badge": "Mandi Rates (Sample Preview)",
+    "title": "Maharashtra APMC Market Rates",
+    "subtitle": "Minimum, maximum, and modal market prices for commodities",
+    "disclaimer": "Notice: These are sample indicative prices. Please verify with your local APMC before final trading.",
+    "table": {
+      "crop": "Commodity",
+      "variety": "Variety",
+      "market": "APMC Market",
+      "min": "Min Price",
+      "max": "Max Price",
+      "modal": "Modal Price",
+      "unit": "Unit",
+      "trend": "Trend"
+    },
+    "filterPlaceholder": "Search commodity or APMC market...",
+    "trendUp": "Up",
+    "trendDown": "Down",
+    "trendStable": "Stable"
+  },
+  "knowledgeSection": {
+    "badge": "Knowledge Centre",
+    "title": "Modern Farming Methods & Guides",
+    "subtitle": "Expert agronomy insights, disease prevention, and best practices",
+    "readGuide": "Read Guide",
+    "readTime": "Read Time",
+    "tips": "Key Farming Tips"
+  },
+  "helpline": {
+    "title": "Kisan Assistance & Guidance Desk",
+    "desc": "Access government schemes, agronomy advice, and toll-free expert consultations.",
+    "tollFree": "Toll Free Kisan Call Centre: 1800-180-1551 (6:00 AM to 10:00 PM)",
+    "btn": "Learn More"
+  },
+  "footer": {
+    "about": "ShetiTech is dedicated to empowering farmers in Maharashtra through modern technology, smart farm calculators, and scientific crop knowledge.",
+    "quickLinks": "Quick Links",
+    "toolsLinks": "Farm Calculators",
+    "support": "Farmer Support",
+    "disclaimerText": "Disclaimer: All information, calculators, and data provided on this platform are for educational and advisory guidance.",
+    "rights": "All rights reserved. Smart Farming, Better Future!",
+    "developedFor": "Dedicated to the hard-working farmers of Maharashtra."
+  },
+  "modal": {
+    "close": "Close",
+    "comingSoonTitle": "Coming Soon in Phase 2!",
+    "comingSoonDesc": "This advanced capability is currently in development for Phase 2. Stay tuned for exciting additions!",
+    "gotIt": "Got It",
+    "cropDetails": "Crop Management Details",
+    "sowing": "Recommended Sowing Period",
+    "fertilizer": "Fertilizer Schedule (NPK)",
+    "pest": "Pest & Disease Control",
+    "profit": "Expected Yield & Economics",
+    "season": "Season"
+  },
+  "calculatorModal": {
+    "landArea": {
+      "title": "Land Area Converter",
+      "desc": "Instant conversion across Guntha, Acre, Hectare, Bigha, and Sq. Feet",
+      "inputLabel": "Enter Area",
+      "selectUnit": "Select Unit",
+      "guntha": "Guntha",
+      "acre": "Acre",
+      "hectare": "Hectare",
+      "bigha": "Bigha",
+      "sqft": "Square Feet",
+      "results": "Converted Area:"
+    },
+    "fertilizer": {
+      "title": "Fertilizer Dosage Calculator",
+      "desc": "Compute recommended NPK bag dosages for your land area and crop",
+      "selectCrop": "Select Crop",
+      "enterAcre": "Land Area (Acres)",
+      "calculate": "Calculate Dosage",
+      "urea": "Urea (46% N)",
+      "dap": "DAP (18:46:0)",
+      "mop": "MOP / Potash (60% K)"
+    },
+    "seed": {
+      "title": "Seed Rate Calculator",
+      "desc": "Calculate seed quantity and recommended row-to-row spacing",
+      "seedRequired": "Required Seed",
+      "spacing": "Recommended Spacing"
+    },
+    "cost": {
+      "title": "Crop Cost & Profit Calculator",
+      "desc": "Calculate tillage, seeds, fertilizers, labor cost, and projected net profit",
+      "landPrep": "Land Preparation (₹)",
+      "seedCost": "Seed Cost (₹)",
+      "fertCost": "Fertilizer & Pesticides (₹)",
+      "laborCost": "Labor & Irrigation (₹)",
+      "expectedYield": "Expected Yield (Quintals)",
+      "expectedRate": "Expected Price (₹/Quintal)",
+      "totalCost": "Total Cost",
+      "totalIncome": "Gross Income",
+      "netProfit": "Net Profit"
+    }
+  }
+}
