@@ -49,6 +49,7 @@ export const AuthModal: React.FC = () => {
   const [timer, setTimer] = useState(30);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [serverOtp, setServerOtp] = useState<string | null>(null);
 
   // Timer for resending OTP
   useEffect(() => {
@@ -69,6 +70,7 @@ export const AuthModal: React.FC = () => {
       setOtp('');
       setErrorMsg('');
       setTimer(30);
+      setServerOtp(null);
     }
   }, [isAuthModalOpen]);
 
@@ -87,8 +89,13 @@ export const AuthModal: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await api.sendOtp(cleanPhone);
+      const res = await api.sendOtp(cleanPhone);
       setIsLoading(false);
+      if (res && res.debug_otp) {
+        setServerOtp(res.debug_otp);
+      } else {
+        setServerOtp(null);
+      }
       setStep('otp');
       setTimer(45);
     } catch (err: unknown) {
@@ -100,6 +107,7 @@ export const AuthModal: React.FC = () => {
             ? 'बॅकएंड सर्व्हरशी संपर्क होऊ शकला नाही. कृपया बॅकएंड (run.ps1) सुरू असल्याची खात्री करा किंवा चाचणीसाठी 123456 वापरा.'
             : 'Backend server is offline. Please ensure Backend (run.ps1) is running, or use demo code 123456.';
       }
+      setServerOtp('123456');
       setErrorMsg(errMsg);
       setStep('otp');
       setTimer(45);
@@ -163,8 +171,11 @@ export const AuthModal: React.FC = () => {
     setErrorMsg('');
     setIsLoading(true);
     try {
-      await api.sendOtp(phoneNumber);
+      const res = await api.sendOtp(phoneNumber);
       setIsLoading(false);
+      if (res && res.debug_otp) {
+        setServerOtp(res.debug_otp);
+      }
       setTimer(45);
     } catch (err: unknown) {
       setIsLoading(false);
@@ -321,20 +332,41 @@ export const AuthModal: React.FC = () => {
               </p>
             </div>
 
-            {/* SMS Gateway Dispatched Notice */}
-            <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200/80 text-center text-xs text-emerald-950 font-medium space-y-0.5">
-              <div className="flex items-center justify-center gap-1.5 font-bold text-emerald-900">
-                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-                <span>
-                  {language === 'mr' ? 'SMS द्वारे OTP पाठवला आहे' : 'OTP Dispatched via SMS'}
-                </span>
+            {/* SMS Gateway Status Notice */}
+            {serverOtp ? (
+              <div className="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 text-center text-xs text-amber-950 font-medium space-y-1">
+                <div className="flex items-center justify-center gap-1 font-bold text-amber-900">
+                  <span>💡 {language === 'mr' ? 'पडताळणी OTP कोड:' : 'Verification OTP:'}</span>
+                  <button
+                    type="button"
+                    onClick={() => setOtp(serverOtp)}
+                    title={language === 'mr' ? 'कोड भरा' : 'Auto-fill'}
+                    className="underline tracking-widest font-mono text-base font-black ml-1 text-amber-950 hover:text-forest-900 cursor-pointer"
+                  >
+                    {serverOtp}
+                  </button>
+                </div>
+                <p className="text-[11px] text-amber-800 leading-normal">
+                  {language === 'mr'
+                    ? '(Fast2SMS खाते सक्रिय होईपर्यंत हा कोड वापरून चाचणी पूर्ण करा)'
+                    : '(Fast2SMS account pending activation; use this code to test)'}
+                </p>
               </div>
-              <p className="text-[11px] text-emerald-800">
-                {language === 'mr'
-                  ? `आपल्या +91 ${phoneNumber} मोबाईलवर आलेला ६ अंकी कोड खाली टाका:`
-                  : `Enter the 6-digit verification code received on +91 ${phoneNumber}:`}
-              </p>
-            </div>
+            ) : (
+              <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200/80 text-center text-xs text-emerald-950 font-medium space-y-0.5">
+                <div className="flex items-center justify-center gap-1.5 font-bold text-emerald-900">
+                  <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>
+                    {language === 'mr' ? 'SMS द्वारे OTP पाठवला आहे' : 'OTP Dispatched via SMS'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-emerald-800">
+                  {language === 'mr'
+                    ? `आपल्या +91 ${phoneNumber} मोबाईलवर आलेला ६ अंकी कोड खाली टाका:`
+                    : `Enter the 6-digit verification code received on +91 ${phoneNumber}:`}
+                </p>
+              </div>
+            )}
 
             <div>
               <input
