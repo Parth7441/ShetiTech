@@ -49,7 +49,6 @@ export const AuthModal: React.FC = () => {
   const [timer, setTimer] = useState(30);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [serverDebugOtp, setServerDebugOtp] = useState<string | null>(null);
 
   // Timer for resending OTP
   useEffect(() => {
@@ -70,7 +69,6 @@ export const AuthModal: React.FC = () => {
       setOtp('');
       setErrorMsg('');
       setTimer(30);
-      setServerDebugOtp(null);
     }
   }, [isAuthModalOpen]);
 
@@ -89,21 +87,14 @@ export const AuthModal: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const res = await api.sendOtp(cleanPhone);
+      await api.sendOtp(cleanPhone);
       setIsLoading(false);
-      if (res && res.debug_otp) {
-        setServerDebugOtp(res.debug_otp);
-      } else {
-        setServerDebugOtp(null);
-      }
       setStep('otp');
       setTimer(45);
     } catch (err: unknown) {
       setIsLoading(false);
       const errMsg = err instanceof Error ? err.message : 'OTP पाठवण्यात अडचण आली.';
       setErrorMsg(errMsg);
-      // Fallback: still allow developer to proceed with test code if backend disconnected
-      setServerDebugOtp('123456');
       setStep('otp');
       setTimer(45);
     }
@@ -152,11 +143,8 @@ export const AuthModal: React.FC = () => {
     setErrorMsg('');
     setIsLoading(true);
     try {
-      const res = await api.sendOtp(phoneNumber);
+      await api.sendOtp(phoneNumber);
       setIsLoading(false);
-      if (res && res.debug_otp) {
-        setServerDebugOtp(res.debug_otp);
-      }
       setTimer(45);
     } catch (err: unknown) {
       setIsLoading(false);
@@ -313,27 +301,20 @@ export const AuthModal: React.FC = () => {
               </p>
             </div>
 
-            {/* SMS Gateway Notice / Demo OTP Banner */}
-            {serverDebugOtp ? (
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-center text-xs text-amber-950 font-medium">
-                <span>💡 {language === 'mr' ? 'SMS गेटवे पडताळणी कोड:' : 'SMS Gateway Verification OTP:'} </span>
-                <button
-                  type="button"
-                  onClick={() => setOtp(serverDebugOtp)}
-                  title={language === 'mr' ? 'ऑटो-फिल करा' : 'Click to auto-fill'}
-                  className="underline tracking-widest font-mono text-amber-900 text-sm font-bold ml-1 hover:text-forest-900 cursor-pointer"
-                >
-                  {serverDebugOtp}
-                </button>
-                <span className="block text-[10px] text-amber-800 mt-0.5">
-                  {language === 'mr' ? '(क्लिक करून कोड टाका किंवा टाईप करा)' : '(Click above to auto-fill or enter)'}
+            {/* SMS Gateway Dispatched Notice */}
+            <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200/80 text-center text-xs text-emerald-950 font-medium space-y-0.5">
+              <div className="flex items-center justify-center gap-1.5 font-bold text-emerald-900">
+                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>
+                  {language === 'mr' ? 'SMS द्वारे OTP पाठवला आहे' : 'OTP Dispatched via SMS'}
                 </span>
               </div>
-            ) : (
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-center text-xs text-emerald-950 font-medium">
-                📲 {language === 'mr' ? `+91 ${phoneNumber} वर SMS द्वारे OTP पाठवला गेला आहे.` : `SMS OTP has been dispatched to +91 ${phoneNumber}.`}
-              </div>
-            )}
+              <p className="text-[11px] text-emerald-800">
+                {language === 'mr'
+                  ? `आपल्या +91 ${phoneNumber} मोबाईलवर आलेला ६ अंकी कोड खाली टाका:`
+                  : `Enter the 6-digit verification code received on +91 ${phoneNumber}:`}
+              </p>
+            </div>
 
             <div>
               <input
