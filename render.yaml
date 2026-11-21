@@ -1,0 +1,28 @@
+services:
+  # 1. FastAPI Python Backend Web Service
+  - type: web
+    name: shetitech-backend
+    runtime: python
+    rootDir: Backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      - key: DATABASE_URL
+        value: sqlite:///./shetitech.db
+      - key: BACKEND_CORS_ORIGINS
+        value: '["*"]'
+
+  # 2. React Vite Frontend Static Site
+  - type: web
+    name: shetitech-frontend
+    runtime: static
+    rootDir: Frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
