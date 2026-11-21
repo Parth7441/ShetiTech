@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { Modal } from '../common/Modal';
+import { api } from '../../services/api';
 import {
   KeyRound,
   User,
@@ -48,6 +49,7 @@ export const AuthModal: React.FC = () => {
   const [timer, setTimer] = useState(30);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [serverDebugOtp, setServerDebugOtp] = useState<string | null>(null);
 
   // Timer for resending OTP
   useEffect(() => {
@@ -68,12 +70,13 @@ export const AuthModal: React.FC = () => {
       setOtp('');
       setErrorMsg('');
       setTimer(30);
+      setServerDebugOtp(null);
     }
   }, [isAuthModalOpen]);
 
-  const handlePhoneSubmit = (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const cleanPhone = phoneNumber.replace(/\D/g, '').slice(-10);
     if (cleanPhone.length !== 10) {
       setErrorMsg(
         language === 'mr'
@@ -85,14 +88,28 @@ export const AuthModal: React.FC = () => {
     setErrorMsg('');
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const res = await api.sendOtp(cleanPhone);
       setIsLoading(false);
+      if (res && res.debug_otp) {
+        setServerDebugOtp(res.debug_otp);
+      } else {
+        setServerDebugOtp(null);
+      }
       setStep('otp');
-      setTimer(30);
-    }, 400);
+      setTimer(45);
+    } catch (err: unknown) {
+      setIsLoading(false);
+      const errMsg = err instanceof Error ? err.message : 'OTP पाठवण्यात अडचण आली.';
+      setErrorMsg(errMsg);
+      // Fallback: still allow developer to proceed with test code if backend disconnected
+      setServerDebugOtp('123456');
+      setStep('otp');
+      setTimer(45);
+    }
   };
 
-  const handleOtpSubmit = (e: React.FormEvent) => {
+  const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length < 4) {
       setErrorMsg(
@@ -103,14 +120,49 @@ export const AuthModal: React.FC = () => {
     setErrorMsg('');
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const res = await api.verifyOtp(phoneNumber, otp);
       setIsLoading(false);
-      if (!farmerName) {
-        setStep('profile');
-      } else {
-        completeLogin();
+
+      if (res.verified) {
+        if (res.farmer && res.farmer.name) {
+          // Existing farmer profile returned by backend
+          await login({
+            phone: res.farmer.phone,
+            name: res.farmer.name,
+            district: res.farmer.district || 'Pune',
+            village: res.farmer.village || '',
+            landSizeAcres: res.farmer.land_size_acres || 3.0,
+            preferredLanguage: (res.farmer.preferred_language as 'mr' | 'en') || language
+          });
+        } else {
+          // New farmer: prompt for name and land details
+          setStep('profile');
+        }
       }
-    }, 400);
+    } catch (err: unknown) {
+      setIsLoading(false);
+      const errMsg = err instanceof Error ? err.message : 'अवैध OTP कोड. कृपया तपासून पुन्हा टाका.';
+      setErrorMsg(errMsg);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (timer > 0 || !phoneNumber) return;
+    setErrorMsg('');
+    setIsLoading(true);
+    try {
+      const res = await api.sendOtp(phoneNumber);
+      setIsLoading(false);
+      if (res && res.debug_otp) {
+        setServerDebugOtp(res.debug_otp);
+      }
+      setTimer(45);
+    } catch (err: unknown) {
+      setIsLoading(false);
+      const errMsg = err instanceof Error ? err.message : 'OTP पुन्हा पाठवण्यात त्रुटी आली.';
+      setErrorMsg(errMsg);
+    }
   };
 
   const handleProfileSubmit = (e: React.FormEvent) => {
@@ -261,11 +313,27 @@ export const AuthModal: React.FC = () => {
               </p>
             </div>
 
-            {/* Test OTP Hint Banner */}
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-center text-xs text-amber-950 font-medium">
-              💡 {language === 'mr' ? 'चाचणी OTP (Test Code):' : 'Demo OTP:'}{' '}
-              <strong className="underline tracking-widest font-mono text-amber-900 text-sm ml-1">123456</strong>
-            </div>
+            {/* SMS Gateway Notice / Demo OTP Banner */}
+            {serverDebugOtp ? (
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-center text-xs text-amber-950 font-medium">
+                <span>💡 {language === 'mr' ? 'SMS गेटवे पडताळणी कोड:' : 'SMS Gateway Verification OTP:'} </span>
+                <button
+                  type="button"
+                  onClick={() => setOtp(serverDebugOtp)}
+                  title={language === 'mr' ? 'ऑटो-फिल करा' : 'Click to auto-fill'}
+                  className="underline tracking-widest font-mono text-amber-900 text-sm font-bold ml-1 hover:text-forest-900 cursor-pointer"
+                >
+                  {serverDebugOtp}
+                </button>
+                <span className="block text-[10px] text-amber-800 mt-0.5">
+                  {language === 'mr' ? '(क्लिक करून कोड टाका किंवा टाईप करा)' : '(Click above to auto-fill or enter)'}
+                </span>
+              </div>
+            ) : (
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-center text-xs text-emerald-950 font-medium">
+                📲 {language === 'mr' ? `+91 ${phoneNumber} वर SMS द्वारे OTP पाठवला गेला आहे.` : `SMS OTP has been dispatched to +91 ${phoneNumber}.`}
+              </div>
+            )}
 
             <div>
               <input
@@ -275,7 +343,7 @@ export const AuthModal: React.FC = () => {
                 autoFocus
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                placeholder="123456"
+                placeholder="000000"
                 className="w-full py-3.5 text-center text-2xl font-black tracking-[0.4em] bg-white border-2 border-gray-200 rounded-xl focus:border-forest-600 focus:ring-2 focus:ring-forest-100 focus:outline-hidden text-forest-950 shadow-2xs"
               />
             </div>
@@ -297,7 +365,7 @@ export const AuthModal: React.FC = () => {
               ) : (
                 <button
                   type="button"
-                  onClick={() => setTimer(30)}
+                  onClick={handleResendOtp}
                   className="font-bold text-forest-800 hover:text-forest-950 flex items-center gap-1 cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
@@ -311,7 +379,7 @@ export const AuthModal: React.FC = () => {
               disabled={isLoading || otp.length < 4}
               className="w-full py-3.5 bg-forest-800 hover:bg-forest-900 active:bg-forest-950 text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              <span>{language === 'mr' ? 'पडताळणी करा आणि पुढे जा' : 'Verify & Continue'}</span>
+              <span>{isLoading ? (language === 'mr' ? 'पडताळत आहे...' : 'Verifying...') : (language === 'mr' ? 'पडताळणी करा आणि पुढे जा' : 'Verify & Continue')}</span>
               <CheckCircle2 className="w-4 h-4" />
             </button>
           </form>

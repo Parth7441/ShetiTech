@@ -229,5 +229,54 @@ export const api = {
     } catch {
       return [];
     }
+  },
+
+  // SMS Gateway OTP Services
+  async sendOtp(phone: string): Promise<{
+    status: string;
+    message: string;
+    phone: string;
+    expires_in_seconds?: number;
+    debug_otp?: string;
+  }> {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    const res = await fetch(`${API_BASE_URL}/auth/send-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: cleanPhone })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed to dispatch OTP via SMS Gateway');
+    }
+    return await res.json();
+  },
+
+  async verifyOtp(phone: string, otp: string): Promise<{
+    status: string;
+    verified: boolean;
+    message: string;
+    is_new_user: boolean;
+    farmer?: {
+      phone: string;
+      name?: string;
+      district?: string;
+      taluka?: string;
+      village?: string;
+      land_size_acres?: number;
+      preferred_language?: string;
+    } | null;
+  }> {
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    const res = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: cleanPhone, otp })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Invalid or expired OTP code');
+    }
+    return await res.json();
   }
 };

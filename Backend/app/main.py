@@ -7,7 +7,7 @@ from app.core.database import engine, Base, SessionLocal
 from app.seed.seed_data import seed_initial_data
 import app.models # ensure all models are imported
 
-from app.routers import crops, mandi, weather, harvesters, farmers, inquiries
+from app.routers import crops, mandi, weather, harvesters, farmers, inquiries, auth
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -46,6 +46,7 @@ app.include_router(weather.router, prefix=settings.API_V1_STR)
 app.include_router(harvesters.router, prefix=settings.API_V1_STR)
 app.include_router(farmers.router, prefix=settings.API_V1_STR)
 app.include_router(inquiries.router, prefix=settings.API_V1_STR)
+app.include_router(auth.router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Health"])
 def health_check():

@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     DATA_GOV_IN_API_KEY: str = ""
     AGMARKNET_RESOURCE_ID: str = "9ef84268-d588-465a-a308-a864a43d0070"
     
+    # SMS Gateway Configurations (Fast2SMS / Twilio)
+    FAST2SMS_API_KEY: str = ""
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_PHONE_NUMBER: str = ""
+    
     # CORS Origins allowed to call the API
     BACKEND_CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:5173",
