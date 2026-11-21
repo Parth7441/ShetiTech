@@ -93,3 +93,16 @@ export interface FarmingGuide {
   author: LocalizedString;
   tag: LocalizedString;
 }
+
+export interface FarmerUser {
+  id?: number;
+  phone: string;
+  name: string;
+  district: string;
+  taluka: string;
+  village: string;
+  landSizeAcres: number;
+  preferredLanguage: Language;
+  isLoggedIn: boolean;
+  registeredDate?: string;
+}

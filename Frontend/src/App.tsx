@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
+import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { HomePage } from './pages/HomePage';
@@ -32,34 +33,36 @@ const ScrollToTop: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <LanguageProvider>
-      <BrowserRouter>
-        <ScrollToTop />
-        <div className="flex flex-col min-h-screen bg-[#F8FAF7] text-charcoal w-full overflow-x-hidden">
-          {/* Global Navigation Bar (Fixed at top) */}
-          <Navbar />
+      <AuthProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <div className="flex flex-col min-h-screen bg-[#F8FAF7] text-charcoal w-full overflow-x-hidden">
+            {/* Global Navigation Bar (Fixed at top) */}
+            <Navbar />
 
-          {/* Main Content Routing (Offset for fixed 80px navbar) */}
-          <div className="flex-1 pt-20 w-full">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/season-crops" element={<SeasonCropsPage />} />
-              <Route path="/harvesters" element={<HarvestersPage />} />
-              <Route path="/fertilizers" element={<FertilizersPage />} />
-              <Route path="/buyers-traders" element={<BuyersTradersPage />} />
-              <Route path="/subsidies" element={<SubsidiesPage />} />
-              <Route path="/market-overview" element={<MarketOverviewPage />} />
-              <Route path="/crops" element={<CropsPage />} />
-              <Route path="/calculators" element={<CalculatorsPage />} />
-              <Route path="/weather" element={<WeatherPage />} />
-              <Route path="/mandi" element={<MandiPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+            {/* Main Content Routing (Offset for fixed 80px navbar) */}
+            <div className="flex-1 pt-20 w-full">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/season-crops" element={<SeasonCropsPage />} />
+                <Route path="/harvesters" element={<HarvestersPage />} />
+                <Route path="/fertilizers" element={<FertilizersPage />} />
+                <Route path="/buyers-traders" element={<BuyersTradersPage />} />
+                <Route path="/subsidies" element={<SubsidiesPage />} />
+                <Route path="/market-overview" element={<MarketOverviewPage />} />
+                <Route path="/crops" element={<CropsPage />} />
+                <Route path="/calculators" element={<CalculatorsPage />} />
+                <Route path="/weather" element={<WeatherPage />} />
+                <Route path="/mandi" element={<MandiPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </div>
+
+            {/* Global Agriculture Footer */}
+            <Footer />
           </div>
-
-          {/* Global Agriculture Footer */}
-          <Footer />
-        </div>
-      </BrowserRouter>
+        </BrowserRouter>
+      </AuthProvider>
     </LanguageProvider>
   );
 };

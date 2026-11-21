@@ -136,18 +136,63 @@ export const api = {
     return await res.json();
   },
 
-  // Sync Farmer Profile (Firebase Phone OTP linkage)
-  async syncFarmer(phone: string, name?: string, district?: string, preferred_language = 'mr') {
+  // Sync / Register Farmer Profile
+  async syncFarmer(farmerData: {
+    phone: string;
+    name?: string;
+    district?: string;
+    taluka?: string;
+    village?: string;
+    land_size_acres?: number;
+    preferred_language?: string;
+  }) {
     try {
       const res = await fetch(`${API_BASE_URL}/farmers/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, name, district, preferred_language })
+        body: JSON.stringify(farmerData)
       });
       if (!res.ok) return null;
       return await res.json();
     } catch {
       return null;
+    }
+  },
+
+  // Get Farmer Profile by Phone
+  async getFarmer(phone: string) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/farmers/${phone}`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
+
+  // Update Farmer Profile
+  async updateFarmer(phone: string, updates: Record<string, unknown>) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/farmers/${phone}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
+
+  // Get Bookings
+  async getBookings() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/harvesters/bookings`);
+      if (!res.ok) return [];
+      return await res.json();
+    } catch {
+      return [];
     }
   }
 };

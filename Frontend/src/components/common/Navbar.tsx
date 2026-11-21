@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { AuthModal } from '../auth/AuthModal';
+import { FarmerProfileModal } from '../auth/FarmerProfileModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Logo } from './Logo';
 import {
@@ -17,13 +20,15 @@ import {
   CloudSun,
   ChevronDown,
   Layers,
-  Sparkles
+  Sparkles,
+  User
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
   const { t, language } = useLanguage();
+  const { farmer, isLoggedIn, openAuthModal, openProfileModal } = useAuth();
   const location = useLocation();
 
   // Primary desktop navigation links (concise labels to prevent any overflow on laptops)
@@ -227,8 +232,32 @@ export const Navbar: React.FC = () => {
             </Link>
           </nav>
 
-          {/* 3. Right Action Area: Language Switcher (shrink-0 guaranteed within navbar) */}
+          {/* 3. Right Action Area: Login/Profile + Language Switcher (shrink-0 guaranteed within navbar) */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Farmer Auth Button */}
+            {isLoggedIn ? (
+              <button
+                onClick={openProfileModal}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-forest-50 hover:bg-forest-100 text-forest-950 border border-forest-200 shadow-2xs transition-all whitespace-nowrap"
+                title={language === 'mr' ? 'शेतकरी प्रोफाईल उघडा' : 'Open Farmer Profile'}
+              >
+                <span className="w-6 h-6 rounded-lg bg-forest-800 text-white flex items-center justify-center text-xs font-black">
+                  {farmer?.name ? farmer.name[0] : '👨‍🌾'}
+                </span>
+                <span className="hidden sm:inline-block max-w-[85px] truncate font-semibold">
+                  {farmer?.name}
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={openAuthModal}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-forest-800 hover:bg-forest-900 text-white shadow-xs transition-all whitespace-nowrap"
+              >
+                <User className="w-3.5 h-3.5 text-fresh" />
+                <span>{language === 'mr' ? 'लॉगिन' : 'Login'}</span>
+              </button>
+            )}
+
             <LanguageSwitcher variant="header" />
 
             {/* Mobile Hamburger Toggle (hidden on desktop lg+) */}
@@ -247,6 +276,41 @@ export const Navbar: React.FC = () => {
       {/* Mobile Drawer Menu (Strictly positioned overlay directly under 80px navbar) */}
       {mobileMenuOpen && (
         <div className="lg:hidden absolute top-20 left-0 right-0 w-full border-b border-forest-100 bg-white px-4 pt-3 pb-6 shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto">
+          {/* Mobile Auth Button */}
+          <div className="mb-3 pb-3 border-b border-gray-100">
+            {isLoggedIn ? (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openProfileModal();
+                }}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-forest-50 border border-forest-200 text-left font-bold text-xs text-forest-950"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-lg bg-forest-800 text-white flex items-center justify-center text-xs font-black">
+                    {farmer?.name ? farmer.name[0] : '👨‍🌾'}
+                  </span>
+                  <div>
+                    <span className="block">{farmer?.name}</span>
+                    <span className="text-[10px] text-charcoal-muted font-normal">+91 {farmer?.phone}</span>
+                  </div>
+                </div>
+                <span className="text-forest-700 text-xs font-bold">{language === 'mr' ? 'प्रोफाईल पहा →' : 'View Profile →'}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openAuthModal();
+                }}
+                className="w-full py-2.5 bg-forest-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs"
+              >
+                <User className="w-4 h-4 text-fresh" />
+                <span>{language === 'mr' ? 'शेतकरी लॉगिन / नोंदणी करा' : 'Farmer Login / Register'}</span>
+              </button>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
             {allNavLinks.map((link) => {
               const Icon = link.icon;
@@ -277,6 +341,10 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Auth Modals */}
+      <AuthModal />
+      <FarmerProfileModal />
     </header>
   );
 };

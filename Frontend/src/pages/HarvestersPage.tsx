@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { harvestersData, type HarvesterModel } from '../data/harvestersData';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { Badge } from '../components/common/Badge';
 import { Modal } from '../components/common/Modal';
 import { api } from '../services/api';
@@ -19,16 +20,17 @@ import {
 
 export const HarvestersPage: React.FC = () => {
   const { language } = useLanguage();
+  const { farmer } = useAuth();
   const [selectedModel, setSelectedModel] = useState<HarvesterModel | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   
   // Booking Form State
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingFor, setBookingFor] = useState<HarvesterModel | null>(null);
-  const [farmerName, setFarmerName] = useState('');
-  const [farmerPhone, setFarmerPhone] = useState('');
-  const [village, setVillage] = useState('');
-  const [acres, setAcres] = useState('2');
+  const [farmerName, setFarmerName] = useState(farmer?.name || '');
+  const [farmerPhone, setFarmerPhone] = useState(farmer?.phone || '');
+  const [village, setVillage] = useState(farmer?.village || '');
+  const [acres, setAcres] = useState(farmer?.landSizeAcres?.toString() || '2');
   const [requestedDate, setRequestedDate] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -47,6 +49,12 @@ export const HarvestersPage: React.FC = () => {
     setBookingFor(model);
     setSelectedModel(null);
     setBookingSuccess(false);
+    if (farmer) {
+      setFarmerName(farmer.name);
+      setFarmerPhone(farmer.phone);
+      setVillage(farmer.village || farmer.district);
+      setAcres(farmer.landSizeAcres?.toString() || '2');
+    }
     setShowBookingModal(true);
   };
 
