@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -45,25 +46,25 @@ export const Modal: React.FC<ModalProps> = ({
     '3xl': 'max-w-3xl'
   };
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-charcoal-dark/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 max-h-[90vh] flex flex-col`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 max-h-[90vh] my-auto flex flex-col`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-[#F8FAF7]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-[#F8FAF7] shrink-0">
           <div className="font-bold text-lg md:text-xl text-forest-900 pr-4">
             {title}
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-500 hover:text-charcoal-dark hover:bg-gray-200/60 rounded-full transition-colors"
+            className="p-2 text-gray-500 hover:text-charcoal-dark hover:bg-gray-200/60 rounded-full transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -75,6 +76,7 @@ export const Modal: React.FC<ModalProps> = ({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

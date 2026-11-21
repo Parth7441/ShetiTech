@@ -10,7 +10,8 @@ import {
   ArrowRight,
   RefreshCw,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  ChevronLeft
 } from 'lucide-react';
 
 const MAHARASHTRA_DISTRICTS = [
@@ -59,7 +60,7 @@ export const AuthModal: React.FC = () => {
     return () => clearInterval(interval);
   }, [step, timer]);
 
-  // Reset modal on close
+  // Reset modal state on close
   useEffect(() => {
     if (!isAuthModalOpen) {
       setStep('phone');
@@ -84,12 +85,11 @@ export const AuthModal: React.FC = () => {
     setErrorMsg('');
     setIsLoading(true);
 
-    // Simulate sending OTP
     setTimeout(() => {
       setIsLoading(false);
       setStep('otp');
       setTimer(30);
-    }, 600);
+    }, 400);
   };
 
   const handleOtpSubmit = (e: React.FormEvent) => {
@@ -103,16 +103,14 @@ export const AuthModal: React.FC = () => {
     setErrorMsg('');
     setIsLoading(true);
 
-    // For test OTP (any 4-6 digit code works, default demo: 123456)
     setTimeout(() => {
       setIsLoading(false);
-      // If user hasn't set name, go to quick profile setup; otherwise finish
       if (!farmerName) {
         setStep('profile');
       } else {
         completeLogin();
       }
-    }, 500);
+    }, 400);
   };
 
   const handleProfileSubmit = (e: React.FormEvent) => {
@@ -156,26 +154,30 @@ export const AuthModal: React.FC = () => {
       <div className="space-y-5">
         
         {/* Step Indicator */}
-        <div className="flex items-center justify-between text-xs font-bold text-charcoal-muted px-2 pb-2 border-b border-gray-100">
+        <div className="flex items-center justify-between text-xs font-bold text-charcoal-muted px-1 pb-3 border-b border-gray-100">
           <span className={`flex items-center gap-1.5 ${step === 'phone' ? 'text-forest-800' : 'text-gray-400'}`}>
-            <span className="w-5 h-5 rounded-full bg-forest-100 text-forest-900 flex items-center justify-center text-[11px]">
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${step === 'phone' ? 'bg-forest-800 text-white' : 'bg-gray-100 text-gray-500'}`}>
               १
             </span>
-            {language === 'mr' ? 'मोबाईल नंबर' : 'Phone'}
+            <span>{language === 'mr' ? 'मोबाईल नंबर' : 'Phone'}</span>
           </span>
+
           <span className="text-gray-300">→</span>
+
           <span className={`flex items-center gap-1.5 ${step === 'otp' ? 'text-forest-800' : 'text-gray-400'}`}>
-            <span className="w-5 h-5 rounded-full bg-forest-100 text-forest-900 flex items-center justify-center text-[11px]">
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${step === 'otp' ? 'bg-forest-800 text-white' : 'bg-gray-100 text-gray-500'}`}>
               २
             </span>
-            {language === 'mr' ? 'OTP' : 'OTP'}
+            <span>{language === 'mr' ? 'OTP' : 'OTP'}</span>
           </span>
+
           <span className="text-gray-300">→</span>
+
           <span className={`flex items-center gap-1.5 ${step === 'profile' ? 'text-forest-800' : 'text-gray-400'}`}>
-            <span className="w-5 h-5 rounded-full bg-forest-100 text-forest-900 flex items-center justify-center text-[11px]">
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${step === 'profile' ? 'bg-forest-800 text-white' : 'bg-gray-100 text-gray-500'}`}>
               ३
             </span>
-            {language === 'mr' ? 'प्रोफाईल' : 'Profile'}
+            <span>{language === 'mr' ? 'प्रोफाईल' : 'Profile'}</span>
           </span>
         </div>
 
@@ -188,26 +190,31 @@ export const AuthModal: React.FC = () => {
         {/* STEP 1: Phone Number */}
         {step === 'phone' && (
           <form onSubmit={handlePhoneSubmit} className="space-y-4">
-            <div className="p-4 bg-forest-50/70 rounded-2xl border border-forest-100 flex items-start gap-3">
-              <ShieldCheck className="w-6 h-6 text-forest-700 shrink-0 mt-0.5" />
+            <div className="p-4 bg-forest-50/80 rounded-2xl border border-forest-200/80 flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 text-forest-700 shrink-0 mt-0.5" />
               <div className="text-xs sm:text-sm text-forest-950 leading-relaxed">
-                <strong>{language === 'mr' ? 'सुरक्षित व सोपे लॉगिन' : 'Quick & Secure Login'}:</strong>
-                <span className="block text-charcoal-muted text-xs mt-0.5">
+                <strong className="block font-bold mb-0.5">
+                  {language === 'mr' ? 'सुरक्षित व सोपे लॉगिन' : 'Quick & Secure Login'}:
+                </strong>
+                <span className="text-charcoal-muted text-xs block">
                   {language === 'mr'
-                    ? 'पासवर्डची गरज नाही. मोबाईलवर येणाऱ्या OTP द्वारे लॉगिन करा.'
-                    : 'No password needed. Simply login using OTP sent to your phone.'}
+                    ? 'पासवर्ड लक्षात ठेवण्याची गरज नाही. आपल्या मोबाईल नंबरवर OTP पाठवला जाईल.'
+                    : 'No password needed. An instant verification OTP will be sent to your phone.'}
                 </span>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-charcoal-muted uppercase mb-1.5">
-                {language === 'mr' ? 'मोबाईल नंबर' : 'Mobile Number'} *
+              <label className="block text-xs font-bold text-charcoal-muted uppercase tracking-wider mb-2">
+                {language === 'mr' ? 'मोबाईल नंबर टाका' : 'Enter Mobile Number'} *
               </label>
-              <div className="relative flex items-center">
-                <span className="absolute left-3.5 text-sm font-bold text-gray-500 border-r border-gray-200 pr-2">
-                  🇮🇳 +91
-                </span>
+
+              {/* Robust Flex Input Container: Flag + Prefix is completely isolated from user input */}
+              <div className="flex items-center rounded-xl border-2 border-gray-200 bg-white focus-within:border-forest-600 focus-within:ring-2 focus-within:ring-forest-100 transition-all overflow-hidden shadow-2xs">
+                <div className="px-3.5 py-3 bg-[#F4F6F3] border-r border-gray-200 text-sm font-bold text-forest-950 flex items-center gap-1.5 select-none shrink-0">
+                  <span className="text-base leading-none">🇮🇳</span>
+                  <span>+91</span>
+                </div>
                 <input
                   type="tel"
                   maxLength={10}
@@ -216,17 +223,22 @@ export const AuthModal: React.FC = () => {
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="98765 43210"
-                  className="w-full pl-22 pr-4 py-3 text-base font-bold tracking-wide bg-[#F8FAF7] border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
+                  className="w-full px-4 py-3 text-base font-bold text-forest-950 bg-transparent border-none outline-hidden tracking-wider placeholder:tracking-normal placeholder:font-normal placeholder:text-gray-400"
                 />
               </div>
+              <p className="text-[11px] text-charcoal-muted mt-1.5 px-1">
+                {language === 'mr'
+                  ? '१० अंकी भारतीय मोबाईल नंबर टाका'
+                  : 'Enter your 10-digit Indian phone number'}
+              </p>
             </div>
 
             <button
               type="submit"
               disabled={isLoading || phoneNumber.length < 10}
-              className="w-full py-3 bg-forest-800 hover:bg-forest-900 text-white font-bold rounded-xl text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3.5 bg-forest-800 hover:bg-forest-900 active:bg-forest-950 text-white font-bold rounded-xl text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              <span>{language === 'mr' ? 'OTP पाठवा' : 'Send OTP'}</span>
+              <span>{isLoading ? (language === 'mr' ? 'पाठवत आहे...' : 'Sending...') : (language === 'mr' ? 'OTP पाठवा' : 'Send OTP')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -235,21 +247,24 @@ export const AuthModal: React.FC = () => {
         {/* STEP 2: OTP Verification */}
         {step === 'otp' && (
           <form onSubmit={handleOtpSubmit} className="space-y-4">
-            <div className="text-center space-y-1">
+            <div className="text-center space-y-1 py-1">
               <div className="w-12 h-12 bg-forest-100 rounded-2xl flex items-center justify-center mx-auto text-forest-800">
                 <KeyRound className="w-6 h-6" />
               </div>
-              <p className="text-xs text-charcoal-muted pt-2">
+              <h4 className="text-base font-black text-forest-950 pt-1">
+                {language === 'mr' ? 'OTP पडताळणी' : 'Enter OTP'}
+              </h4>
+              <p className="text-xs text-charcoal-muted">
                 {language === 'mr'
-                  ? `+91 ${phoneNumber} वर पाठवलेला OTP टाका:`
-                  : `Enter the OTP sent to +91 ${phoneNumber}:`}
+                  ? `+91 ${phoneNumber} वर पाठवलेला कोड टाका:`
+                  : `Enter the code sent to +91 ${phoneNumber}:`}
               </p>
             </div>
 
             {/* Test OTP Hint Banner */}
             <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-center text-xs text-amber-950 font-medium">
-              💡 {language === 'mr' ? 'चाचणी OTP (Demo OTP):' : 'Test OTP:'}{' '}
-              <strong className="underline tracking-wider font-mono text-amber-900">123456</strong>
+              💡 {language === 'mr' ? 'चाचणी OTP (Test Code):' : 'Demo OTP:'}{' '}
+              <strong className="underline tracking-widest font-mono text-amber-900 text-sm ml-1">123456</strong>
             </div>
 
             <div>
@@ -260,18 +275,19 @@ export const AuthModal: React.FC = () => {
                 autoFocus
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                placeholder="• • • • • •"
-                className="w-full py-3 text-center text-2xl font-black tracking-widest bg-[#F8FAF7] border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
+                placeholder="123456"
+                className="w-full py-3.5 text-center text-2xl font-black tracking-[0.4em] bg-white border-2 border-gray-200 rounded-xl focus:border-forest-600 focus:ring-2 focus:ring-forest-100 focus:outline-hidden text-forest-950 shadow-2xs"
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs text-charcoal-muted">
+            <div className="flex items-center justify-between text-xs text-charcoal-muted pt-1">
               <button
                 type="button"
                 onClick={() => setStep('phone')}
-                className="hover:text-forest-800 underline"
+                className="hover:text-forest-800 font-semibold flex items-center gap-1 cursor-pointer"
               >
-                {language === 'mr' ? 'नंबर बदला' : 'Change Number'}
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>{language === 'mr' ? 'नंबर बदला' : 'Change Number'}</span>
               </button>
 
               {timer > 0 ? (
@@ -282,10 +298,10 @@ export const AuthModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setTimer(30)}
-                  className="font-bold text-forest-800 hover:text-forest-950 flex items-center gap-1"
+                  className="font-bold text-forest-800 hover:text-forest-950 flex items-center gap-1 cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
-                  {language === 'mr' ? 'OTP पुन्हा पाठवा' : 'Resend OTP'}
+                  <span>{language === 'mr' ? 'OTP पुन्हा पाठवा' : 'Resend OTP'}</span>
                 </button>
               )}
             </div>
@@ -293,7 +309,7 @@ export const AuthModal: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || otp.length < 4}
-              className="w-full py-3 bg-forest-800 hover:bg-forest-900 text-white font-bold rounded-xl text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3.5 bg-forest-800 hover:bg-forest-900 active:bg-forest-950 text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <span>{language === 'mr' ? 'पडताळणी करा आणि पुढे जा' : 'Verify & Continue'}</span>
               <CheckCircle2 className="w-4 h-4" />
@@ -304,11 +320,11 @@ export const AuthModal: React.FC = () => {
         {/* STEP 3: Quick Profile Registration */}
         {step === 'profile' && (
           <form onSubmit={handleProfileSubmit} className="space-y-4">
-            <div className="p-3 bg-forest-50 rounded-xl border border-forest-100 flex items-center gap-2 text-xs text-forest-900">
+            <div className="p-3.5 bg-forest-50/80 rounded-xl border border-forest-200/80 flex items-center gap-2.5 text-xs text-forest-900">
               <Sparkles className="w-4 h-4 text-fresh shrink-0" />
               <span>
                 {language === 'mr'
-                  ? 'आपली माहिती भरून ShetiTech च्या सर्व सुविधा मिळवा:'
+                  ? 'आपली माहिती भरून ShetiTech च्या सर्व शेती सुविधा मिळवा:'
                   : 'Complete your profile for personalized agricultural advisory:'}
               </span>
             </div>
@@ -322,10 +338,11 @@ export const AuthModal: React.FC = () => {
                 <input
                   type="text"
                   required
+                  autoFocus
                   value={farmerName}
                   onChange={(e) => setFarmerName(e.target.value)}
                   placeholder={language === 'mr' ? 'उदा. ज्ञानेश्वर पाटील' : 'e.g. Ramesh Patil'}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-[#F8FAF7] border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
                 />
               </div>
             </div>
@@ -338,7 +355,7 @@ export const AuthModal: React.FC = () => {
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full px-3 py-2.5 text-xs sm:text-sm bg-[#F8FAF7] border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden font-medium"
+                  className="w-full px-3 py-2.5 text-xs sm:text-sm bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden font-medium"
                 >
                   {MAHARASHTRA_DISTRICTS.map((dist, i) => (
                     <option key={i} value={dist}>
@@ -359,7 +376,7 @@ export const AuthModal: React.FC = () => {
                     value={village}
                     onChange={(e) => setVillage(e.target.value)}
                     placeholder={language === 'mr' ? 'उदा. बारामती' : 'e.g. Baramati'}
-                    className="w-full pl-9 pr-3 py-2.5 text-xs sm:text-sm bg-[#F8FAF7] border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
+                    className="w-full pl-9 pr-3 py-2.5 text-xs sm:text-sm bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -375,14 +392,14 @@ export const AuthModal: React.FC = () => {
                 step="0.5"
                 value={landSize}
                 onChange={(e) => setLandSize(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm bg-[#F8FAF7] border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
+                className="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-hidden"
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading || !farmerName}
-              className="w-full py-3 bg-forest-800 hover:bg-forest-900 text-white font-bold rounded-xl text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3.5 bg-forest-800 hover:bg-forest-900 active:bg-forest-950 text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <span>{language === 'mr' ? 'नोंदणी पूर्ण करा' : 'Complete Setup'}</span>
               <CheckCircle2 className="w-4 h-4" />

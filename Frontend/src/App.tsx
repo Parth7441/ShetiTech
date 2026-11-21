@@ -4,6 +4,8 @@ import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
+import { AuthModal } from './components/auth/AuthModal';
+import { FarmerProfileModal } from './components/auth/FarmerProfileModal';
 import { HomePage } from './pages/HomePage';
 import { CropsPage } from './pages/CropsPage';
 import { SeasonCropsPage } from './pages/SeasonCropsPage';
@@ -15,6 +17,7 @@ import { MarketOverviewPage } from './pages/MarketOverviewPage';
 import { CalculatorsPage } from './pages/CalculatorsPage';
 import { WeatherPage } from './pages/WeatherPage';
 import { MandiPage } from './pages/MandiPage';
+import { CropDoctorPage } from './pages/CropDoctorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 // Scroll to top on route change (unless hash is present)
@@ -54,12 +57,17 @@ export const App: React.FC = () => {
                 <Route path="/calculators" element={<CalculatorsPage />} />
                 <Route path="/weather" element={<WeatherPage />} />
                 <Route path="/mandi" element={<MandiPage />} />
+                <Route path="/crop-doctor" element={<CropDoctorPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </div>
 
             {/* Global Agriculture Footer */}
             <Footer />
+
+            {/* Global Authentication & Farmer Profile Modals */}
+            <AuthModal />
+            <FarmerProfileModal />
           </div>
         </BrowserRouter>
       </AuthProvider>

@@ -194,5 +194,40 @@ export const api = {
     } catch {
       return [];
     }
+  },
+
+  // Submit Crop Inquiry / Ask Expert
+  async submitInquiry(payload: {
+    farmer_name: string;
+    phone: string;
+    crop_name: string;
+    district?: string;
+    question: string;
+  }) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/inquiries/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
+
+  // Get Inquiries (Optionally filter by phone)
+  async getInquiries(phone?: string, crop?: string) {
+    try {
+      const params = new URLSearchParams();
+      if (phone) params.append('phone', phone);
+      if (crop && crop !== 'all') params.append('crop', crop);
+      const res = await fetch(`${API_BASE_URL}/inquiries/?${params.toString()}`);
+      if (!res.ok) return [];
+      return await res.json();
+    } catch {
+      return [];
+    }
   }
 };

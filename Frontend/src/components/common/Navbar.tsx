@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import { AuthModal } from '../auth/AuthModal';
-import { FarmerProfileModal } from '../auth/FarmerProfileModal';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Logo } from './Logo';
 import {
@@ -21,7 +19,8 @@ import {
   ChevronDown,
   Layers,
   Sparkles,
-  User
+  User,
+  Stethoscope
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -77,6 +76,12 @@ export const Navbar: React.FC = () => {
 
   // Secondary links in "अधिक (More)" dropdown
   const moreLinks = [
+    {
+      name: language === 'mr' ? 'पीक डॉक्टर' : 'Crop Doctor',
+      path: '/crop-doctor',
+      icon: Stethoscope,
+      desc: language === 'mr' ? 'किड-रोग निदान व फवारणी सल्ला' : 'Pest/Disease Diagnosis & Advisory'
+    },
     {
       name: language === 'mr' ? 'हवामान अंदाज' : 'Weather Forecast',
       path: '/weather',
@@ -341,10 +346,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Auth Modals */}
-      <AuthModal />
-      <FarmerProfileModal />
     </header>
   );
 };

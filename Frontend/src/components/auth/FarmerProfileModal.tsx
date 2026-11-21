@@ -12,7 +12,11 @@ import {
   Save,
   CheckCircle2,
   Clock,
-  Layers
+  Layers,
+  Stethoscope,
+  Sparkles,
+  HelpCircle,
+  ArrowRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -28,11 +32,22 @@ interface BookingItem {
   notes?: string;
 }
 
+interface InquiryItem {
+  id: number;
+  farmer_name: string;
+  phone: string;
+  crop_name: string;
+  district?: string;
+  question: string;
+  expert_answer?: string;
+  status: string;
+}
+
 export const FarmerProfileModal: React.FC = () => {
   const { farmer, isProfileModalOpen, closeProfileModal, logout, updateProfile } = useAuth();
   const { language } = useLanguage();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'bookings' | 'quicklinks'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'bookings' | 'inquiries' | 'quicklinks'>('profile');
   const [name, setName] = useState(farmer?.name || '');
   const [district, setDistrict] = useState(farmer?.district || 'Pune');
   const [village, setVillage] = useState(farmer?.village || '');
@@ -41,6 +56,8 @@ export const FarmerProfileModal: React.FC = () => {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
+  const [loadingInquiries, setLoadingInquiries] = useState(false);
 
   // Sync state when farmer updates
   useEffect(() => {
@@ -52,17 +69,22 @@ export const FarmerProfileModal: React.FC = () => {
     }
   }, [farmer]);
 
-  // Load farmer's harvester bookings
+  // Load farmer's harvester bookings and inquiries
   useEffect(() => {
     if (isProfileModalOpen && farmer?.phone) {
       setLoadingBookings(true);
       api.getBookings().then((allBookings: BookingItem[]) => {
-        // Filter by phone or show recent bookings
         const filtered = allBookings.filter(
           (b) => b.phone === farmer.phone || b.farmer_name.includes(farmer.name)
         );
         setBookings(filtered.length > 0 ? filtered : allBookings.slice(0, 3));
         setLoadingBookings(false);
+      });
+
+      setLoadingInquiries(true);
+      api.getInquiries(farmer.phone).then((res: InquiryItem[]) => {
+        setInquiries(res || []);
+        setLoadingInquiries(false);
       });
     }
   }, [isProfileModalOpen, farmer]);
@@ -132,10 +154,10 @@ export const FarmerProfileModal: React.FC = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-gray-200 text-xs sm:text-sm font-bold">
+        <div className="flex border-b border-gray-200 text-xs sm:text-sm font-bold overflow-x-auto">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`pb-3 px-4 transition-all relative ${
+            className={`pb-3 px-3 sm:px-4 transition-all relative shrink-0 ${
               activeTab === 'profile'
                 ? 'text-forest-800 border-b-2 border-forest-800'
                 : 'text-charcoal-muted hover:text-charcoal'
@@ -146,7 +168,7 @@ export const FarmerProfileModal: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('bookings')}
-            className={`pb-3 px-4 transition-all relative ${
+            className={`pb-3 px-3 sm:px-4 transition-all relative shrink-0 ${
               activeTab === 'bookings'
                 ? 'text-forest-800 border-b-2 border-forest-800'
                 : 'text-charcoal-muted hover:text-charcoal'
@@ -161,8 +183,24 @@ export const FarmerProfileModal: React.FC = () => {
           </button>
 
           <button
+            onClick={() => setActiveTab('inquiries')}
+            className={`pb-3 px-3 sm:px-4 transition-all relative shrink-0 ${
+              activeTab === 'inquiries'
+                ? 'text-forest-800 border-b-2 border-forest-800'
+                : 'text-charcoal-muted hover:text-charcoal'
+            }`}
+          >
+            {language === 'mr' ? 'माझे प्रश्न व सल्ला' : 'My Inquiries'}
+            {inquiries.length > 0 && (
+              <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-bold">
+                {inquiries.length}
+              </span>
+            )}
+          </button>
+
+          <button
             onClick={() => setActiveTab('quicklinks')}
-            className={`pb-3 px-4 transition-all relative ${
+            className={`pb-3 px-3 sm:px-4 transition-all relative shrink-0 ${
               activeTab === 'quicklinks'
                 ? 'text-forest-800 border-b-2 border-forest-800'
                 : 'text-charcoal-muted hover:text-charcoal'
@@ -315,9 +353,102 @@ export const FarmerProfileModal: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 3: Quick Farm Tools */}
+        {/* TAB 3: Crop Doctor Inquiries & Advisories */}
+        {activeTab === 'inquiries' && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-charcoal-muted uppercase">
+                {language === 'mr' ? 'माझे विचारलेले प्रश्न व सल्ला' : 'My Questions & Expert Answers'}
+              </span>
+              <Link
+                to="/crop-doctor"
+                onClick={closeProfileModal}
+                className="text-xs font-bold text-forest-800 hover:underline flex items-center gap-1"
+              >
+                <Stethoscope className="w-3.5 h-3.5" />
+                <span>{language === 'mr' ? '+ नवीन प्रश्न विचारा' : '+ Ask New Question'}</span>
+              </Link>
+            </div>
+
+            {loadingInquiries ? (
+              <div className="text-center py-8 text-xs text-charcoal-muted">
+                {language === 'mr' ? 'प्रश्न लोड होत आहेत...' : 'Loading inquiries...'}
+              </div>
+            ) : inquiries.length === 0 ? (
+              <div className="text-center py-8 bg-[#F8FAF7] rounded-2xl border border-gray-100">
+                <HelpCircle className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                <p className="text-xs text-charcoal-muted font-medium">
+                  {language === 'mr'
+                    ? 'आपण अद्याप कोणताही प्रश्न विचारलेला नाही.'
+                    : 'No crop inquiries submitted yet.'}
+                </p>
+                <Link
+                  to="/crop-doctor"
+                  onClick={closeProfileModal}
+                  className="inline-flex items-center gap-1 mt-3 px-4 py-2 bg-forest-800 text-white rounded-xl text-xs font-bold shadow-xs hover:bg-forest-900 transition-colors"
+                >
+                  <Stethoscope className="w-3.5 h-3.5" />
+                  <span>{language === 'mr' ? 'पीक डॉक्टरला विचारा' : 'Consult Crop Doctor'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            ) : (
+              inquiries.map((inq) => (
+                <div
+                  key={inq.id}
+                  className="p-4 rounded-xl bg-[#F8FAF7] border border-gray-200 space-y-2.5"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-forest-100 text-forest-800">
+                      🌾 {inq.crop_name}
+                    </span>
+                    <Badge variant="fresh" size="sm">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      {language === 'mr' ? 'सल्ला उपलब्ध' : 'Advisory Ready'}
+                    </Badge>
+                  </div>
+
+                  <p className="text-xs font-bold text-forest-950">
+                    ❓ {inq.question}
+                  </p>
+
+                  {inq.expert_answer && (
+                    <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 text-xs text-emerald-950 leading-relaxed font-medium">
+                      <strong className="block text-emerald-900 font-bold mb-1 flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                        {language === 'mr' ? 'कृषी तज्ज्ञ शिफारस:' : 'Expert Advisory Recommendation:'}
+                      </strong>
+                      {inq.expert_answer}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* TAB 4: Quick Farm Tools */}
         {activeTab === 'quicklinks' && (
           <div className="grid grid-cols-2 gap-3">
+            <Link
+              to="/crop-doctor"
+              onClick={closeProfileModal}
+              className="col-span-2 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-forest-50 border border-emerald-200 hover:border-emerald-400 transition-all text-left flex items-center justify-between"
+            >
+              <div>
+                <span className="text-xs font-black text-forest-950 flex items-center gap-1.5 mb-0.5">
+                  <Stethoscope className="w-4 h-4 text-emerald-600" />
+                  {language === 'mr' ? 'पीक डॉक्टर व किड-रोग निदान' : 'Crop Doctor & Pest Diagnosis'}
+                </span>
+                <span className="text-[11px] text-charcoal-muted">
+                  {language === 'mr'
+                    ? 'सोयाबीन, ऊस, कांदा, हळद रोगांचे निदान व अचूक फवारणी डोस'
+                    : 'ICAR research-backed disease treatment & spray dosage'}
+                </span>
+              </div>
+              <ArrowRight className="w-4 h-4 text-forest-800 shrink-0" />
+            </Link>
+
             <Link
               to="/calculators#fertilizer"
               onClick={closeProfileModal}

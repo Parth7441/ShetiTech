@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import {
   Search,
@@ -7,7 +8,8 @@ import {
   Calculator,
   ShieldCheck,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  Stethoscope
 } from 'lucide-react';
 import type { Crop } from '../../types';
 
@@ -73,12 +75,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Left Text & Search */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             
-            {/* Tagline Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest-200 shadow-xs">
-              <span className="flex h-2 w-2 rounded-full bg-fresh" />
-              <span className="text-xs md:text-sm font-bold text-forest-900">
-                {t('hero.badge')}
-              </span>
+            {/* Tagline Badge + Crop Doctor Link */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-forest-200 shadow-xs">
+                <span className="flex h-2 w-2 rounded-full bg-fresh" />
+                <span className="text-xs md:text-sm font-bold text-forest-900">
+                  {t('hero.badge')}
+                </span>
+              </div>
+
+              <Link
+                to="/crop-doctor"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300 text-emerald-950 text-xs md:text-sm font-bold transition-all shadow-2xs group"
+              >
+                <Stethoscope className="w-3.5 h-3.5 text-emerald-700 group-hover:scale-110 transition-transform" />
+                <span>{language === 'mr' ? 'पीक डॉक्टर व सल्ला →' : 'Crop Doctor & Advisory →'}</span>
+              </Link>
             </div>
 
             {/* Main Headline in Marathi & English */}
