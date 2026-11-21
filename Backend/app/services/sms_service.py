@@ -16,7 +16,7 @@ def send_sms_otp(phone: str, otp_code: str) -> dict:
     if len(clean_phone) > 10:
         clean_phone = clean_phone[-10:]
 
-    # 1. Fast2SMS Integration (Fastest & most popular for India)
+    # 1. Fast2SMS Integration (Live SMS Gateway)
     if settings.FAST2SMS_API_KEY:
         try:
             url = "https://www.fast2sms.com/dev/bulkV2"
@@ -39,18 +39,19 @@ def send_sms_otp(phone: str, otp_code: str) -> dict:
                 }
             else:
                 logger.warning(f"Fast2SMS response: {res_data}")
-                api_msg = res_data.get("message", "Fast2SMS activation required")
-                print(f"\n⚠️ [Fast2SMS Gateway Alert] {api_msg}")
-                print(f"🔑 [Backup OTP Code for +91 {clean_phone}]: {otp_code}\n")
+                api_msg = res_data.get("message", "Fast2SMS dispatch error")
                 return {
-                    "provider": "fast2sms_pending",
-                    "success": True,
-                    "message": api_msg,
-                    "debug_otp": otp_code,
-                    "notice": api_msg
+                    "provider": "fast2sms",
+                    "success": False,
+                    "message": f"Fast2SMS Gateway Error: {api_msg}"
                 }
         except Exception as e:
             logger.error(f"Error calling Fast2SMS: {e}")
+            return {
+                "provider": "fast2sms",
+                "success": False,
+                "message": f"Fast2SMS connection error: {str(e)}"
+            }
 
     # 2. Twilio Integration (Fallback if Twilio credentials provided)
     if settings.TWILIO_ACCOUNT_SID and settings.TWILIO_AUTH_TOKEN and settings.TWILIO_PHONE_NUMBER:

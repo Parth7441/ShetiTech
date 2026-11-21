@@ -51,15 +51,20 @@ def send_otp(payload: SendOtpRequest, db: Session = Depends(get_db)):
         db.add(verification_record)
         db.commit()
 
-    # Dispatch via SMS Gateway (Fast2SMS / Twilio / Simulation)
+    # Dispatch via SMS Gateway (Fast2SMS / Twilio)
     sms_result = send_sms_otp(phone, otp_code)
+
+    if not sms_result.get("success"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=sms_result.get("message", "Failed to dispatch SMS via Gateway")
+        )
 
     return SendOtpResponse(
         status="success",
         message=f"OTP sent successfully to +91 {phone}",
         phone=phone,
-        expires_in_seconds=300,
-        debug_otp=sms_result.get("debug_otp")
+        expires_in_seconds=300
     )
 
 @router.post("/verify-otp", response_model=VerifyOtpResponse)
