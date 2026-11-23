@@ -12,6 +12,8 @@ class SendOtpRequest(BaseModel):
             clean = clean[-10:]
         if len(clean) != 10:
             raise ValueError("Phone number must be a valid 10-digit mobile number")
+        if clean[0] not in "6789":
+            raise ValueError("Phone number must start with 6, 7, 8, or 9")
         return clean
 
 class SendOtpResponse(BaseModel):
@@ -19,7 +21,7 @@ class SendOtpResponse(BaseModel):
     message: str
     phone: str
     expires_in_seconds: int = 300
-    debug_otp: Optional[str] = None
+    resend_cooldown_seconds: int = 60
 
 class VerifyOtpRequest(BaseModel):
     phone: str
@@ -37,8 +39,8 @@ class VerifyOtpRequest(BaseModel):
     @field_validator("otp")
     def validate_otp(cls, v: str) -> str:
         clean = "".join(filter(str.isdigit, v))
-        if len(clean) < 4:
-            raise ValueError("OTP must be 4 to 6 digits")
+        if len(clean) != 6:
+            raise ValueError("OTP must be exactly 6 digits")
         return clean
 
 class VerifyOtpResponse(BaseModel):
@@ -47,3 +49,5 @@ class VerifyOtpResponse(BaseModel):
     message: str
     is_new_user: bool
     farmer: Optional[FarmerResponse] = None
+    access_token: Optional[str] = None
+    token_type: Optional[str] = "bearer"

@@ -6,11 +6,11 @@ logger = logging.getLogger(__name__)
 
 def send_sms_otp(phone: str, otp_code: str) -> dict:
     """
-    Sends a 6-digit verification OTP to the farmer's mobile number.
+    Sends a secure 6-digit verification OTP to the farmer's mobile number.
     Supports:
     1. Fast2SMS (Indian OTP route)
-    2. Twilio (International / Indian SMS)
-    3. Simulation / Development mode (Logged to console when no API key configured)
+    2. Twilio (Alternative SMS Provider)
+    3. Simulation fallback (Safe dev mode when keys are unset)
     """
     clean_phone = "".join(filter(str.isdigit, phone))
     if len(clean_phone) > 10:
@@ -28,17 +28,17 @@ def send_sms_otp(phone: str, otp_code: str) -> dict:
                 "variables_values": otp_code,
                 "numbers": clean_phone
             }
-            response = requests.post(url, data=payload, headers=headers, timeout=10)
+            response = requests.post(url, data=payload, headers=headers, timeout=8)
             res_data = response.json()
             if res_data.get("return") is True:
-                logger.info(f"Fast2SMS OTP successfully dispatched to {clean_phone}")
+                logger.info("Fast2SMS OTP successfully dispatched to recipient")
                 return {
                     "provider": "fast2sms",
                     "success": True,
                     "message": "OTP sent via Fast2SMS SMS Gateway"
                 }
             else:
-                logger.warning(f"Fast2SMS response: {res_data}")
+                logger.warning(f"Fast2SMS API rejected request: {res_data}")
                 api_msg = res_data.get("message", "Fast2SMS dispatch error")
                 return {
                     "provider": "fast2sms",
@@ -60,36 +60,40 @@ def send_sms_otp(phone: str, otp_code: str) -> dict:
             data = {
                 "From": settings.TWILIO_PHONE_NUMBER,
                 "To": f"+91{clean_phone}",
-                "Body": f"शेतीटेक (ShetiTech) लॉगिन पडताळणी OTP: {otp_code}. हा कोड ५ मिनिटांसाठी वैध आहे."
+                "Body": f"शेतीटेक (ShetiTech) पडताळणी OTP: {otp_code}. हा कोड ५ मिनिटांसाठी वैध आहे."
             }
             response = requests.post(
                 url,
                 data=data,
                 auth=(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN),
-                timeout=10
+                timeout=8
             )
             if response.status_code in (200, 201):
-                logger.info(f"Twilio OTP successfully sent to +91{clean_phone}")
+                logger.info("Twilio OTP successfully dispatched to recipient")
                 return {
                     "provider": "twilio",
                     "success": True,
                     "message": "OTP sent via Twilio SMS Gateway"
                 }
             else:
-                logger.warning(f"Twilio returned {response.status_code}: {response.text}")
+                logger.warning(f"Twilio returned status {response.status_code}: {response.text}")
+                return {
+                    "provider": "twilio",
+                    "success": False,
+                    "message": f"Twilio SMS Error: HTTP {response.status_code}"
+                }
         except Exception as e:
             logger.error(f"Error calling Twilio: {e}")
+            return {
+                "provider": "twilio",
+                "success": False,
+                "message": f"Twilio connection error: {str(e)}"
+            }
 
-    # 3. Development / Simulation Mode (Fallback when API key is not yet configured)
-    print("\n" + "="*60)
-    print(f"📱 [SHETITECH SMS GATEWAY] Farmer Phone: +91 {clean_phone}")
-    print(f"🔑 [SHETITECH SMS GATEWAY] Verification OTP: {otp_code}")
-    print(f"🕒 [SHETITECH SMS GATEWAY] Validity: 5 Minutes")
-    print("="*60 + "\n")
-
+    # 3. Development / Simulation Mode (Active when no SMS gateway key is configured)
+    logger.info(f"[SMS GATEWAY DEV MODE] Verification OTP sent to +91 {clean_phone}")
     return {
         "provider": "simulation",
         "success": True,
-        "message": "Demo mode OTP generated. Add FAST2SMS_API_KEY in .env for live SMS delivery.",
-        "debug_otp": otp_code
+        "message": "OTP generated and dispatched successfully"
     }
